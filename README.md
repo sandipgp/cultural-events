@@ -20,10 +20,24 @@ Built with **React + Vite** and **Supabase** (free Postgres database + Storage).
 
 ## 2. Set up the database + photo storage
 
-1. In your project, open **SQL Editor → New query**.
-2. Paste the entire contents of [`supabase-setup.sql`](./supabase-setup.sql) and
-   click **Run**. This creates the `submissions` table, the public `photos`
-   storage bucket, and the access policies.
+You have two options — both create the tables, the `photos` bucket, and all the
+access policies. They're safe to re-run.
+
+**Option A — paste SQL (no setup):** In your project open **SQL Editor → New
+query**, paste the contents of [`supabase-setup.sql`](./supabase-setup.sql), Run,
+then do the same with [`supabase-events-setup.sql`](./supabase-events-setup.sql).
+
+**Option B — one command:** add `SUPABASE_DB_URL` to `.env.local` (Supabase →
+**Project Settings → Database → Connection string → URI**, the one with your DB
+password), then:
+
+```bash
+npm run db:init
+```
+
+This runs both `.sql` files against your database. The connection string is a
+privileged secret — it's kept **out** of the `VITE_` vars so it never ships to
+the browser, and `.env.local` is gitignored.
 
 ## 3. Get your API keys
 
