@@ -103,14 +103,6 @@ export default function Dashboard() {
 
       <p className="foot">
         Ganpati Bappa Morya 🌺
-        {!isAdmin && (
-          <>
-            <br />
-            <Link className="manage-link" to="/manage">
-              Admin
-            </Link>
-          </>
-        )}
       </p>
     </div>
   )
