@@ -1,135 +1,124 @@
-# 🪔 Ganpati Photo Contest
+# 🪔 Vivantalife Vedika · Ganeshotsav App
 
-A trendy mobile web app for a society Ganpati decoration photo contest.
+A mobile-first web app for the society's Ganeshotsav — Aarti scheduling,
+cultural program registrations, an events schedule, and a photo contest, all
+under one festive theme.
 
-- **Submit screen** (`/`) — logo header, Ganesh intro, and a form: name, flat
-  number dropdown (A101–A1108, 88 flats), and a single photo upload. Only one
-  photo per flat is allowed; uploading again **replaces** the old one after a
-  confirmation prompt. Shows a thank-you message when done.
-- **Gallery screen** (`/gallery`) — all photos in a grid of cards with name and
-  flat, plus a password-protected **Set winner** control (🏆 badge).
-
-Built with **React + Vite** and **Supabase** (free Postgres database + Storage).
+Built with **React + Vite** and **Supabase** (Postgres database + file storage).
 
 ---
 
-## 1. Create a free Supabase project
+## Features
 
-1. Go to https://supabase.com → sign up → **New project** (free tier, no card).
-2. Wait ~2 minutes for it to provision.
+**Dashboard** (`/`) — the home screen with tiles linking to every section. A
+"Program Winners" tile appears automatically once winners have been set.
 
-## 2. Set up the database + photo storage
+**Schedule Aarti** (`/aarti`) — book an Aarti slot: name, flat number
+(A101–A1108), date (14–20 Sep), and slot (Morning / Evening). One booking per
+flat; submitting again updates it. Multiple flats may share the same date/slot.
 
-You have two options — both create the tables, the `photos` bucket, and all the
-access policies. They're safe to re-run.
+**Aarti Schedule** (`/aarti/list`) — a table of all bookings. Admins can edit or
+delete any row; members change their own by booking again.
 
-**Option A — paste SQL (no setup):** In your project open **SQL Editor → New
-query**, paste the contents of [`supabase-setup.sql`](./supabase-setup.sql), Run,
-then do the same with [`supabase-events-setup.sql`](./supabase-events-setup.sql).
+**Participate in Program** (`/program`) — register for cultural programs: name,
+age group (0-2 / 2-5 / Above 5 yrs / Adults), one or more programs
+(Dance / Fashion Show / Singing, plus a free-text "Other"), and an optional
+description.
 
-**Option B — one command:** add `SUPABASE_DB_URL` to `.env.local` (Supabase →
-**Project Settings → Database → Connection string → URI**, the one with your DB
-password), then:
+**Participants** (`/program/list`) — a table of everyone registered, filterable
+by program (including "Others" for custom entries). Admins can set/unset
+winners, edit, or delete entries.
 
-```bash
-npm run db:init
-```
+**Program Winners** (`/program/winners`) — shows the winners once an admin has
+marked them.
 
-This runs both `.sql` files against your database. The connection string is a
-privileged secret — it's kept **out** of the `VITE_` vars so it never ships to
-the browser, and `.env.local` is gitignored.
+**Events Schedule** (`/events`) — the festival programme. Admins can add, edit,
+and delete events (title, date, time, description). Events sort by date and by
+actual clock time.
 
-## 3. Get your API keys
+**Photo Contest** (`/photo`, `/gallery`, `/winners`) — submit one decoration
+photo per flat, browse the gallery, and view winners. Includes an optional
+AI check (Google Gemini) that flags AI-generated photos and can reject
+non-Ganpati images. Admins can mark winners, remove entries, and open/close the
+contest from the gallery.
 
-1. In Supabase go to **Project Settings → API**.
-2. Copy the **Project URL** and the **anon public** key.
+**Admin** — a single password (entered from the header) unlocks all management
+controls across the app for the session.
 
-## 4. Configure the app
+---
+
+## Setup
+
+### 1. Create a Supabase project
+Sign up at https://supabase.com and create a new project (free tier).
+
+### 2. Configure the app
+Copy the example environment file and fill in your own values:
 
 ```bash
 cp .env.example .env.local
 ```
 
-Edit `.env.local`:
+Open `.env.example` — it lists and explains every value the app needs
+(Supabase keys, admin password, festival dates, optional AI check, site URL for
+link previews, and the database connection used by the setup script). Fill the
+same keys into `.env.local`. `.env.local` is gitignored and never committed.
 
+### 3. Set up the database
+This creates all tables, the photo storage bucket, and access policies. Two
+options — both are safe to re-run:
+
+**Option A — one command** (uses the DB connection string from your config):
+```bash
+npm run db:init
 ```
 
-# Last date to submit, shown in the contest rules (free text)
-VITE_LAST_DATE=15 September 2026
+**Option B — paste SQL:** in the Supabase dashboard open **SQL Editor → New
+query**, run [`supabase-setup.sql`](./supabase-setup.sql), then run
+[`supabase-events-setup.sql`](./supabase-events-setup.sql).
 
-# Winners screen switch: 1 = contest over (show winners),
-# 0 = force open (hide winners), blank = follow the date above
-VITE_CONTEST_OVER=0
-
-# Optional — AI photo check. VITE_AI_CHECK=1 runs it, 0 skips it.
-VITE_AI_CHECK=1
-VITE_GEMINI_API_KEY=your-gemini-key
-VITE_GEMINI_MODEL=gemini-2.5-flash
-```
-
-The admin password is what you'll type on the Gallery screen to unlock the
-"Set winner" buttons.
-
-The Gemini key is optional — get one free at
-https://aistudio.google.com/apikey. If you leave it blank, the app still works
-and just asks each user to self-certify their photo instead of checking it.
-
-## 5. Run it
-
+### 4. Run it
 ```bash
 npm install
 npm run dev
 ```
-
-Open the printed URL (e.g. http://localhost:5173) on your phone or in a
+Open the printed URL (e.g. http://localhost:5173) on your phone or a
 mobile-sized browser window.
 
-## 6. (Optional) Add a Ganesh image
-
-Drop a `ganesh.png` into a `public/` folder in the project root. If it's not
-there, the app shows a 🕉️ emoji instead — nothing breaks.
-
-## 7. Link previews on WhatsApp (Open Graph)
-
-When you share the link, WhatsApp shows a title, description and image. Two
-things make the image and URL correct:
-
-1. Set **`VITE_SITE_URL`** to your deployed URL (no trailing slash), both in
-   `.env.local` and in your host's env vars. It's substituted into the OG tags
-   at build time.
-2. Put a **`public/og-image.jpg`** sized **1200×630**. Without it the preview
-   still shows the title and description, just no picture.
-
-WhatsApp caches previews hard. If you re-share and the old preview sticks,
-share the URL with a throwaway query (`?v=2`) to force a fresh fetch, or run it
-through Facebook's Sharing Debugger (https://developers.facebook.com/tools/debug/).
-
-## 8. Deploy for free
-
-Push to GitHub and import into **Vercel** or **Netlify**. Add the same
-environment variables in the host's dashboard. Both offer free static hosting
-for a Vite app.
+### 5. (Optional) Images
+- `public/ganesh-logo.svg` is the themed header logo (already included).
+- Add `public/og-image.jpg` (1200×630) for WhatsApp / social link previews.
 
 ---
 
-### Notes on the design choices
+## Deploy (Vercel)
 
-- **One photo per flat:** the flat number is a unique key in the database, and
-  each flat's photo is stored at a fixed path (`flat-A101`), so re-uploading
-  overwrites cleanly with no leftover files.
-- **Admin password** is checked in the browser — good enough to stop casual
-  tampering at a society event, but not real security. If you later want proper
-  protection, we can move winner-setting behind Supabase Auth.
-- **AI photo check (Gemini):** on submit, the photo is sent to Google Gemini,
-  which judges whether it looks AI-generated or heavily AI-filtered. The user
-  sees the result and confirms before uploading, and flagged photos get an
-  "🤖 AI" label in the gallery. Two things to know:
-  - It's a **best-effort** check, not a forensic detector — it will sometimes
-    be wrong either way. For a reliable result, use a dedicated service like
-    Sightengine or Hive instead of Gemini.
-  - The `VITE_GEMINI_API_KEY` is **bundled into the browser**, so a determined
-    user could extract and misuse it. For a small contest that's usually fine;
-    to lock it down, move the `detectAiPhoto` fetch into a serverless function
-    (Vercel/Netlify function or a Supabase Edge Function) that holds the key
-    server-side, and have the app call that instead. Set a usage cap/budget on
-    the key in Google AI Studio either way.
+1. Push the repo to GitHub and import it at https://vercel.com (it auto-detects
+   Vite), **or** run `npx vercel` from the project folder.
+2. Add the same configuration values in **Project → Settings → Environment
+   Variables**.
+3. `vercel.json` is included so client-side routes (`/aarti`, `/events`, …)
+   don't 404 on refresh.
+
+After the first deploy, set the site URL value to your live URL and redeploy so
+link previews resolve correctly.
+
+---
+
+## Tech notes
+
+- **Data model:** `aarti_schedule`, `program_participants`, `events`, and
+  `app_settings` tables, plus `submissions` and a public `photos` bucket for the
+  photo contest.
+- **Admin access** is a shared password checked in the browser — convenient for
+  a society event, but not hardened security. For stronger control, move
+  management behind Supabase Auth.
+- **Photo contest open/closed** is stored in `app_settings` so an admin can
+  toggle it at runtime from the gallery (no redeploy needed).
+- **AI photo check** is optional and best-effort — a general vision model's
+  judgment, not a forensic detector. It fails open, so it never blocks a
+  submission when unavailable.
+
+---
+
+Ganpati Bappa Morya 🌺

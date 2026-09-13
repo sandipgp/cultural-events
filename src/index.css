@@ -457,7 +457,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 .tbl tbody tr:nth-child(even) { background: #fff6fb; }
 .tbl-flat { font-weight: 700; color: var(--brand); white-space: nowrap; }
 .tbl-slot { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-.tbl-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.tbl-chips { display: flex; flex-wrap: nowrap; gap: 5px; }
+.tbl-chips .chip { white-space: nowrap; }
 .tbl-name { display: flex; align-items: center; gap: 6px; font-weight: 600; }
 .win-star { font-size: 14px; }
 .tbl-desc { margin: 4px 0 0; font-size: 12px; color: var(--muted); line-height: 1.35; max-width: 240px; }
@@ -517,7 +518,18 @@ button.chip { cursor: pointer; }
   color: #fff;
   border-color: transparent;
 }
-.filters { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; margin-bottom: 14px; }
+.filters {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow-x: auto;
+  margin-bottom: 14px;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+.filters::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+.filters .chip { flex: 0 0 auto; white-space: nowrap; }
 
 /* Multi-select checkboxes (Participate form) */
 .checks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }

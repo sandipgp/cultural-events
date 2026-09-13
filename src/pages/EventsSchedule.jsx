@@ -7,6 +7,20 @@ import AppHeader from '../components/AppHeader.jsx'
 
 const EMPTY = { title: '', event_date: AARTI_DATES[0], event_time: '', description: '' }
 
+// Turn free-text time ("7:00 PM", "10 AM", "18:30") into minutes since midnight
+// so events sort chronologically. Blank/unparseable times go last.
+function timeToMinutes(t) {
+  if (!t) return Number.MAX_SAFE_INTEGER
+  const m = t.trim().toLowerCase().match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/)
+  if (!m) return Number.MAX_SAFE_INTEGER
+  let h = parseInt(m[1], 10)
+  const min = m[2] ? parseInt(m[2], 10) : 0
+  const ap = m[3]
+  if (ap === 'pm' && h !== 12) h += 12
+  if (ap === 'am' && h === 12) h = 0
+  return h * 60 + min
+}
+
 export default function EventsSchedule() {
   const { isAdmin } = useAdmin()
   const [rows, setRows] = useState([])
@@ -24,7 +38,7 @@ export default function EventsSchedule() {
       const sorted = (data || []).sort(
         (a, b) =>
           dateIndex(a.event_date) - dateIndex(b.event_date) ||
-          (a.event_time || '').localeCompare(b.event_time || '')
+          timeToMinutes(a.event_time) - timeToMinutes(b.event_time)
       )
       setRows(sorted)
     }
