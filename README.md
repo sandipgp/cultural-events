@@ -53,9 +53,6 @@ cp .env.example .env.local
 Edit `.env.local`:
 
 ```
-VITE_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-public-key
-VITE_ADMIN_P=choose-a-password
 
 # Last date to submit, shown in the contest rules (free text)
 VITE_LAST_DATE=15 September 2026
