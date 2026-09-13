@@ -14,12 +14,14 @@ create table if not exists public.aarti_schedule (
   updated_at   timestamptz not null default now()
 );
 
--- 2) Program participants (one entry per flat, events is a list) ------------
+-- 2) Program participants (per person; grouped by age) ----------------------
 create table if not exists public.program_participants (
   id           uuid primary key default gen_random_uuid(),
   name         text        not null,
-  flat_number  text        not null unique,
+  age_group    text,                   -- "0-2 yrs" | "2-5 yrs" | "Above 5 yrs" | "Adults"
   events       text[]      not null default '{}',
+  description  text,
+  is_winner    boolean     not null default false,
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now()
 );
@@ -35,6 +37,13 @@ create table if not exists public.events (
   updated_at   timestamptz not null default now()
 );
 
+-- 4) App settings (admin-toggled flags, e.g. photo contest open/closed) -----
+create table if not exists public.app_settings (
+  key         text primary key,
+  value       text,
+  updated_at  timestamptz not null default now()
+);
+
 -- Row Level Security: public read/insert/update/delete (society app; the
 -- edit/delete controls are gated by the app's admin password, which is
 -- convenience-level protection, not hard security). PostgREST also needs the
@@ -42,7 +51,7 @@ create table if not exists public.events (
 do $$
 declare t text;
 begin
-  foreach t in array array['aarti_schedule','program_participants','events'] loop
+  foreach t in array array['aarti_schedule','program_participants','events','app_settings'] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('drop policy if exists "public read"   on public.%I', t);
     execute format('drop policy if exists "public insert" on public.%I', t);

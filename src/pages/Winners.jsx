@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient.js'
-import { isContestOver } from '../lib/deadline.js'
+import { useContestOver } from '../lib/settings.js'
 
 export default function Winners() {
+  const { over: contestOver } = useContestOver()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-
-  const contestOver = isContestOver()
 
   useEffect(() => {
     if (!contestOver) return // don't fetch winners until the contest is over

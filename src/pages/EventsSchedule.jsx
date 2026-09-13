@@ -101,9 +101,11 @@ export default function EventsSchedule() {
             <tbody>
               {rows.map((row) => (
                 <tr key={row.id}>
-                  <td className="tbl-when">
-                    <span className="chip">{row.event_date}</span>
-                    {row.event_time && <span className="tbl-time">{row.event_time}</span>}
+                  <td>
+                    <div className="when-badge">
+                      <span className="when-date">{row.event_date}</span>
+                      {row.event_time && <span className="when-time">{row.event_time}</span>}
+                    </div>
                   </td>
                   <td>
                     <strong>{row.title}</strong>

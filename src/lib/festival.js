@@ -16,7 +16,10 @@ export const AARTI_DATES = [
 export const SLOTS = ['Morning', 'Evening']
 
 // Cultural program categories (multi-select on the Participate form).
-export const PROGRAMS = ['Dance', 'Drama', 'Fancy Dress', 'Singing']
+export const PROGRAMS = ['Dance', 'Drama', 'Fashion Show', 'Singing']
+
+// Age groups for program participants.
+export const AGE_GROUPS = ['0-2 yrs', '2-5 yrs', 'Above 5 yrs', 'Adults']
 
 // Helpers for sorting list rows in a sensible order.
 export const dateIndex = (d) => AARTI_DATES.indexOf(d)

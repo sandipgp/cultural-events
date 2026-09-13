@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient.js'
-import { FLAT_LIST } from '../lib/flats.js'
-import { PROGRAMS } from '../lib/festival.js'
+import { PROGRAMS, AGE_GROUPS } from '../lib/festival.js'
 import AppHeader from '../components/AppHeader.jsx'
 
 const OTHER = 'Other'
@@ -10,12 +9,12 @@ const OPTIONS = [...PROGRAMS, OTHER]
 
 export default function ProgramForm() {
   const [name, setName] = useState('')
-  const [flat, setFlat] = useState('')
+  const [ageGroup, setAgeGroup] = useState('')
   const [events, setEvents] = useState([])
   const [otherText, setOtherText] = useState('')
+  const [description, setDescription] = useState('')
   const [status, setStatus] = useState('idle') // idle | saving | done
   const [error, setError] = useState('')
-  const [confirmOpen, setConfirmOpen] = useState(false)
 
   function toggleEvent(p) {
     setEvents((prev) =>
@@ -34,37 +33,18 @@ export default function ProgramForm() {
     e.preventDefault()
     setError('')
     if (!name.trim()) return setError('Please enter your name.')
-    if (!flat) return setError('Please select your flat.')
+    if (!ageGroup) return setError('Please select an age group.')
     if (events.length === 0) return setError('Pick at least one program.')
     if (events.includes(OTHER) && !otherText.trim())
       return setError('Please specify the other program.')
 
-    const { data: existing, error: checkErr } = await supabase
-      .from('program_participants')
-      .select('id')
-      .eq('flat_number', flat)
-      .maybeSingle()
-    if (checkErr) return setError(checkErr.message)
-    if (existing) {
-      setConfirmOpen(true)
-      return
-    }
-    await save()
-  }
-
-  async function save() {
-    setConfirmOpen(false)
     setStatus('saving')
-    setError('')
-    const { error } = await supabase.from('program_participants').upsert(
-      {
-        name: name.trim(),
-        flat_number: flat,
-        events: resolvedEvents(),
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'flat_number' }
-    )
+    const { error } = await supabase.from('program_participants').insert({
+      name: name.trim(),
+      age_group: ageGroup,
+      events: resolvedEvents(),
+      description: description.trim() || null,
+    })
     if (error) {
       setStatus('idle')
       return setError(error.message)
@@ -80,7 +60,7 @@ export default function ProgramForm() {
           <div className="thanks-mark">🎭</div>
           <h2>You're in!</h2>
           <p>
-            Flat <strong>{flat}</strong> registered for{' '}
+            <strong>{name}</strong> ({ageGroup}) registered for{' '}
             <strong>{resolvedEvents().join(', ')}</strong>.
           </p>
           <Link className="btn" to="/program/list">
@@ -109,18 +89,18 @@ export default function ProgramForm() {
           <input
             type="text"
             value={name}
-            placeholder="e.g. Sandip Patil"
+            placeholder="e.g. Tanishq Patil"
             onChange={(e) => setName(e.target.value)}
           />
         </label>
 
         <label className="field">
-          <span>Flat number</span>
-          <select value={flat} onChange={(e) => setFlat(e.target.value)}>
-            <option value="">Select your flat…</option>
-            {FLAT_LIST.map((f) => (
-              <option key={f} value={f}>
-                {f}
+          <span>Age group</span>
+          <select value={ageGroup} onChange={(e) => setAgeGroup(e.target.value)}>
+            <option value="">Select age group…</option>
+            {AGE_GROUPS.map((g) => (
+              <option key={g} value={g}>
+                {g}
               </option>
             ))}
           </select>
@@ -151,6 +131,16 @@ export default function ProgramForm() {
           )}
         </div>
 
+        <label className="field">
+          <span>Description (optional)</span>
+          <textarea
+            rows={3}
+            value={description}
+            placeholder="Anything you'd like the organizers to know (song, act, group members…)"
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </label>
+
         {error && <p className="error">{error}</p>}
 
         <button className="btn" type="submit" disabled={status === 'saving'}>
@@ -161,26 +151,6 @@ export default function ProgramForm() {
           View participants →
         </Link>
       </form>
-
-      {confirmOpen && (
-        <div className="modal-backdrop" onClick={() => setConfirmOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Update your entry?</h3>
-            <p>
-              Flat <strong>{flat}</strong> is already registered. This will
-              <strong> replace</strong> it with {resolvedEvents().join(', ')}.
-            </p>
-            <div className="modal-actions">
-              <button className="btn ghost" onClick={() => setConfirmOpen(false)}>
-                Cancel
-              </button>
-              <button className="btn" onClick={save}>
-                Yes, update
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

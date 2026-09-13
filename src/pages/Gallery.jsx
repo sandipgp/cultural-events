@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase, PHOTO_BUCKET } from '../supabaseClient.js'
-import { isContestOver } from '../lib/deadline.js'
+import { useContestOver } from '../lib/settings.js'
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_P || 'ganpati2026'
 
 export default function Gallery() {
+  const { over: contestOver, setContestOver } = useContestOver()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -111,10 +112,19 @@ export default function Gallery() {
         <Link className="btn ghost small" to="/">
           ← Add photo
         </Link>
-        {isContestOver() && (
+        {contestOver && (
           <Link className="btn ghost small" to="/winners">
             🏆 Winners
           </Link>
+        )}
+        {isAdmin && (
+          <button
+            className={`btn small ${contestOver ? '' : 'danger'}`}
+            onClick={() => setContestOver(!contestOver)}
+            title={contestOver ? 'Reopen submissions' : 'Close the photo contest'}
+          >
+            {contestOver ? 'Reopen contest' : 'Close contest'}
+          </button>
         )}
         <span className="count">{rows.length} entries</span>
       </div>

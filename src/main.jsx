@@ -7,6 +7,7 @@ import AartiForm from './pages/AartiForm.jsx'
 import AartiList from './pages/AartiList.jsx'
 import ProgramForm from './pages/ProgramForm.jsx'
 import ProgramList from './pages/ProgramList.jsx'
+import ProgramWinners from './pages/ProgramWinners.jsx'
 import EventsSchedule from './pages/EventsSchedule.jsx'
 import Submit from './pages/Submit.jsx'
 import Gallery from './pages/Gallery.jsx'
@@ -23,6 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/aarti/list" element={<AartiList />} />
           <Route path="/program" element={<ProgramForm />} />
           <Route path="/program/list" element={<ProgramList />} />
+          <Route path="/program/winners" element={<ProgramWinners />} />
           <Route path="/events" element={<EventsSchedule />} />
           {/* Photo contest (kept alongside the events app) */}
           <Route path="/photo" element={<Submit />} />

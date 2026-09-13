@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { supabase } from '../supabaseClient.js'
 import AppHeader from '../components/AppHeader.jsx'
 
 const TILES = [
@@ -11,6 +13,30 @@ const TILES = [
 ]
 
 export default function Dashboard() {
+  // The "Program Winners" tile only appears once an admin has set winners.
+  const [hasWinners, setHasWinners] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      const { count } = await supabase
+        .from('program_participants')
+        .select('id', { count: 'exact', head: true })
+        .eq('is_winner', true)
+      if (active && count > 0) setHasWinners(true)
+    })()
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const tiles = hasWinners
+    ? [
+        ...TILES,
+        { to: '/program/winners', icon: '🏆', title: 'Program Winners', desc: 'Announced results' },
+      ]
+    : TILES
+
   return (
     <div className="screen">
       <AppHeader />
@@ -25,7 +51,7 @@ export default function Dashboard() {
       </div>
 
       <div className="tiles">
-        {TILES.map((t) => (
+        {tiles.map((t) => (
           <Link key={t.to} to={t.to} className="tile card">
             <span className="tile-icon">{t.icon}</span>
             <strong>{t.title}</strong>

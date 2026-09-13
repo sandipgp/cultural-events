@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom'
 import { supabase, PHOTO_BUCKET } from '../supabaseClient.js'
 import { FLAT_LIST } from '../lib/flats.js'
 import { detectAiPhoto, AI_CHECK_ENABLED } from '../lib/aiDetect.js'
-import { LAST_DATE_LABEL, isContestOver } from '../lib/deadline.js'
+import { LAST_DATE_LABEL } from '../lib/deadline.js'
+import { useContestOver } from '../lib/settings.js'
+import AppHeader from '../components/AppHeader.jsx'
 
 const STATUS = {
   IDLE: 'idle',
@@ -16,6 +18,7 @@ const MAX_MB = 10
 const MAX_BYTES = MAX_MB * 1024 * 1024
 
 export default function Submit() {
+  const { over: contestOver } = useContestOver()
   const [name, setName] = useState('')
   const [flat, setFlat] = useState('')
   const [file, setFile] = useState(null)
@@ -130,10 +133,10 @@ export default function Submit() {
     setReplacing(false)
   }
 
-  if (isContestOver()) {
+  if (contestOver) {
     return (
       <div className="screen">
-        <Header />
+        <AppHeader />
         <div className="card thanks">
           <div className="thanks-mark">🏆</div>
           <h2>Submissions are closed</h2>
@@ -156,7 +159,7 @@ export default function Submit() {
   if (status === STATUS.DONE) {
     return (
       <div className="screen">
-        <Header />
+        <AppHeader />
         <div className="card thanks">
           <div className="thanks-mark">🙏</div>
           <h2>Thank you!</h2>
@@ -179,7 +182,7 @@ export default function Submit() {
 
   return (
     <div className="screen">
-      <Header />
+      <AppHeader />
 
       <div className="intro card">
         <GaneshImage />
@@ -336,18 +339,6 @@ export default function Submit() {
         </div>
       )}
     </div>
-  )
-}
-
-function Header() {
-  return (
-    <header className="app-header">
-      <div className="logo">V</div>
-      <div className="logo-text">
-        <strong>Vivantalife Vedika Society</strong>
-        <span>Ganeshotsav 2026</span>
-      </div>
-    </header>
   )
 }
 
