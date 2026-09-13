@@ -16,11 +16,15 @@
 
 * { box-sizing: border-box; }
 
+html {
+  /* Solid theme colour behind everything so overscroll never flashes white. */
+  background-color: var(--bg-grad-2);
+}
 html, body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(160deg, var(--bg-grad-1), var(--bg-grad-2));
-  background-attachment: fixed;
+  min-height: 100%;
+  background: linear-gradient(160deg, var(--bg-grad-1), var(--bg-grad-2)) no-repeat;
   color: var(--ink);
   font-family: "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -32,7 +36,8 @@ img { max-width: 100%; display: block; }
   max-width: 480px;
   margin: 0 auto;
   padding: 16px 16px 40px;
-  min-height: 100vh;
+  min-height: 100vh; /* fallback */
+  min-height: 100dvh; /* matches the visible area on mobile (no toolbar gap) */
 }
 /* Gallery / winners can use the full screen so landscape fits more columns. */
 .screen.wide { max-width: 1000px; }
@@ -409,23 +414,90 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 .tiles {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
+
+/* Tighter vertical rhythm on the dashboard */
+.dash .app-header { padding-bottom: 12px; }
+.dash .intro { padding: 16px 18px; margin-bottom: 12px; }
+.dash .intro h2 { margin: 0 0 4px; font-size: 19px; }
+.dash .intro p { font-size: 13px; }
+.dash .admin-settings-btn { margin-bottom: 12px; padding: 11px 14px; }
+.dash .over-note { margin-bottom: 12px; }
+.dash .foot { margin-top: 14px; }
 .tile {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 4px;
-  padding: 20px 12px;
+  gap: 6px;
+  padding: 16px 12px;
+  margin: 0;
   text-decoration: none;
   color: var(--ink);
-  transition: transform 0.08s;
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 14px rgba(160, 40, 120, 0.07);
+  transition: transform 0.08s, box-shadow 0.15s, border-color 0.15s;
 }
 .tile:active { transform: scale(0.97); }
-.tile-icon { font-size: 30px; }
-.tile strong { color: var(--brand); font-size: 15px; }
-.tile-desc { font-size: 12px; color: var(--muted); }
+.tile:hover { border-color: #f0c4e4; box-shadow: 0 8px 20px rgba(160, 40, 120, 0.12); }
+.tile-icon {
+  font-size: 22px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #fff0f8, #ffe9d6);
+  margin-bottom: 2px;
+}
+.tile strong { color: var(--brand); font-size: 14px; }
+.tile-desc { font-size: 11.5px; color: var(--muted); }
+.tile.disabled {
+  opacity: 0.45;
+  filter: grayscale(0.7);
+  pointer-events: none;
+  cursor: default;
+}
+.tile.disabled strong { color: var(--muted); }
+
+.admin-settings-btn { width: 100%; margin-bottom: 16px; }
+.over-note {
+  text-align: center;
+  background: #fff3d6;
+  border: 1px solid #f0dca8;
+  color: #8a5a00;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+
+/* App settings modal rows */
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.setting-row:first-of-type { border-top: none; }
+.setting-row .btn { flex: 0 0 auto; }
+
+.card-title { margin: 0 0 6px; color: var(--brand); font-size: 16px; }
+.manage-links-title { margin: 4px 0 10px; text-align: center; }
+.logout-btn { width: 100%; }
+.manage-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  text-decoration: none;
+  opacity: 0.7;
+}
+.manage-link:hover { color: var(--brand); opacity: 1; }
 
 /* ---------- Listing pages ---------- */
 .page-bar {

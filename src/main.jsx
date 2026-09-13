@@ -9,6 +9,7 @@ import ProgramForm from './pages/ProgramForm.jsx'
 import ProgramList from './pages/ProgramList.jsx'
 import ProgramWinners from './pages/ProgramWinners.jsx'
 import EventsSchedule from './pages/EventsSchedule.jsx'
+import Manage from './pages/Manage.jsx'
 import Submit from './pages/Submit.jsx'
 import Gallery from './pages/Gallery.jsx'
 import Winners from './pages/Winners.jsx'
@@ -26,6 +27,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/program/list" element={<ProgramList />} />
           <Route path="/program/winners" element={<ProgramWinners />} />
           <Route path="/events" element={<EventsSchedule />} />
+          <Route path="/manage" element={<Manage />} />
           {/* Photo contest (kept alongside the events app) */}
           <Route path="/photo" element={<Submit />} />
           <Route path="/gallery" element={<Gallery />} />

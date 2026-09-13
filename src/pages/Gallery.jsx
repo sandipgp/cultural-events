@@ -2,19 +2,15 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase, PHOTO_BUCKET } from '../supabaseClient.js'
 import { useContestOver } from '../lib/settings.js'
-
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_P || 'ganpati2026'
+import { useAdmin } from '../lib/admin.jsx'
+import AppHeader from '../components/AppHeader.jsx'
 
 export default function Gallery() {
+  const { isAdmin } = useAdmin()
   const { over: contestOver, setContestOver } = useContestOver()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [isAdmin, setIsAdmin] = useState(
-    () => sessionStorage.getItem('isAdmin') === 'yes'
-  )
-  const [pwOpen, setPwOpen] = useState(false)
-  const [pwInput, setPwInput] = useState('')
   const [pendingDelete, setPendingDelete] = useState(null) // row awaiting delete confirm
   const [removing, setRemoving] = useState(false)
 
@@ -33,23 +29,6 @@ export default function Gallery() {
   useEffect(() => {
     load()
   }, [])
-
-  function submitPassword(e) {
-    e.preventDefault()
-    if (pwInput === ADMIN_PASSWORD) {
-      setIsAdmin(true)
-      sessionStorage.setItem('isAdmin', 'yes')
-      setPwOpen(false)
-      setPwInput('')
-    } else {
-      setError('Wrong password.')
-    }
-  }
-
-  function logout() {
-    setIsAdmin(false)
-    sessionStorage.removeItem('isAdmin')
-  }
 
   async function toggleWinner(row) {
     const next = !row.is_winner
@@ -91,22 +70,7 @@ export default function Gallery() {
 
   return (
     <div className="screen wide">
-      <header className="app-header">
-        <div className="logo">V</div>
-        <div className="logo-text">
-          <strong>Photo Gallery</strong>
-          <span>Ganeshotsav 2026</span>
-        </div>
-        {isAdmin ? (
-          <button className="badge-btn" onClick={logout}>
-            Admin ✕
-          </button>
-        ) : (
-          <button className="badge-btn" onClick={() => setPwOpen(true)}>
-            Admin
-          </button>
-        )}
-      </header>
+      <AppHeader title="Photo Gallery" />
 
       <div className="gallery-bar">
         <Link className="btn ghost small" to="/">
@@ -216,30 +180,6 @@ export default function Gallery() {
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {pwOpen && (
-        <div className="modal-backdrop" onClick={() => setPwOpen(false)}>
-          <form className="modal" onClick={(e) => e.stopPropagation()} onSubmit={submitPassword}>
-            <h3>Admin access</h3>
-            <p>Enter the password to set winners.</p>
-            <input
-              type="password"
-              autoFocus
-              value={pwInput}
-              onChange={(e) => setPwInput(e.target.value)}
-              placeholder="Password"
-            />
-            <div className="modal-actions">
-              <button type="button" className="btn ghost" onClick={() => setPwOpen(false)}>
-                Cancel
-              </button>
-              <button type="submit" className="btn">
-                Unlock
-              </button>
-            </div>
-          </form>
         </div>
       )}
     </div>
