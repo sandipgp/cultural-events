@@ -103,33 +103,52 @@ export default function ProgramList() {
         <p className="muted center">No participants yet.</p>
       )}
 
-      <div className="list">
-        {shown.map((row) => (
-          <div className="lrow card" key={row.id}>
-            <div className="lrow-main">
-              <strong>{row.name}</strong>
-              <span className="lrow-sub">Flat {row.flat_number}</span>
-            </div>
-            <div className="lrow-meta wrap">
-              {(row.events || []).map((e) => (
-                <span className="chip" key={e}>
-                  {e}
-                </span>
+      {!loading && shown.length > 0 && (
+        <div className="table-wrap card">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>Flat</th>
+                <th>Name</th>
+                <th>Programs</th>
+                {isAdmin && <th className="tbl-actions-col">Actions</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {shown.map((row) => (
+                <tr key={row.id}>
+                  <td className="tbl-flat">{row.flat_number}</td>
+                  <td>{row.name}</td>
+                  <td>
+                    <div className="tbl-chips">
+                      {(row.events || []).map((e) => (
+                        <span className="chip" key={e}>
+                          {e}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                  {isAdmin && (
+                    <td>
+                      <div className="tbl-actions">
+                        <button
+                          className="btn small ghost"
+                          onClick={() => setEditing({ ...row, events: [...(row.events || [])] })}
+                        >
+                          Edit
+                        </button>
+                        <button className="btn small danger" onClick={() => setPendingDelete(row)}>
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  )}
+                </tr>
               ))}
-            </div>
-            {isAdmin && (
-              <div className="lrow-actions">
-                <button className="btn small ghost" onClick={() => setEditing({ ...row, events: [...(row.events || [])] })}>
-                  Edit
-                </button>
-                <button className="btn small danger" onClick={() => setPendingDelete(row)}>
-                  Delete
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {editing && (
         <div className="modal-backdrop" onClick={() => !busy && setEditing(null)}>

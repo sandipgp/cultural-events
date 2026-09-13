@@ -88,30 +88,45 @@ export default function EventsSchedule() {
         <p className="muted center">No events scheduled yet.</p>
       )}
 
-      <div className="list">
-        {rows.map((row) => (
-          <div className="event-card card" key={row.id}>
-            <div className="event-when">
-              <span className="event-date">{row.event_date}</span>
-              {row.event_time && <span className="event-time">{row.event_time}</span>}
-            </div>
-            <div className="event-body">
-              <strong>{row.title}</strong>
-              {row.description && <p className="event-desc">{row.description}</p>}
-            </div>
-            {isAdmin && (
-              <div className="lrow-actions">
-                <button className="btn small ghost" onClick={() => setDraft({ ...row })}>
-                  Edit
-                </button>
-                <button className="btn small danger" onClick={() => setPendingDelete(row)}>
-                  Delete
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      {!loading && rows.length > 0 && (
+        <div className="table-wrap card">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Event</th>
+                {isAdmin && <th className="tbl-actions-col">Actions</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id}>
+                  <td className="tbl-when">
+                    <span className="chip">{row.event_date}</span>
+                    {row.event_time && <span className="tbl-time">{row.event_time}</span>}
+                  </td>
+                  <td>
+                    <strong>{row.title}</strong>
+                    {row.description && <p className="event-desc">{row.description}</p>}
+                  </td>
+                  {isAdmin && (
+                    <td>
+                      <div className="tbl-actions">
+                        <button className="btn small ghost" onClick={() => setDraft({ ...row })}>
+                          Edit
+                        </button>
+                        <button className="btn small danger" onClick={() => setPendingDelete(row)}>
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Add / edit modal (admin) */}
       {draft && (

@@ -455,6 +455,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 .tbl tbody tr:nth-child(even) { background: #fff6fb; }
 .tbl-flat { font-weight: 700; color: var(--brand); white-space: nowrap; }
 .tbl-slot { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.tbl-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.tbl-when { white-space: nowrap; }
+.tbl-time { display: block; font-size: 12px; color: var(--muted); margin-top: 4px; }
+.tbl td .event-desc { margin: 4px 0 0; }
 .tbl-actions { display: flex; gap: 6px; }
 .tbl-actions .btn { margin: 0; padding: 6px 10px; }
 .tbl-actions-col { text-align: center; }
