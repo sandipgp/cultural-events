@@ -11,13 +11,16 @@ create table if not exists public.submissions (
   photo_url    text        not null,
   is_winner    boolean     not null default false,
   is_ai        boolean     not null default false,  -- flagged by the AI check
+  description  text,
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now()
 );
 
--- If the table already existed before the AI feature, add the column:
+-- If the table already existed, add newer columns:
 alter table public.submissions
   add column if not exists is_ai boolean not null default false;
+alter table public.submissions
+  add column if not exists description text;
 
 -- 2) Row Level Security ------------------------------------------------------
 -- This is a public society contest, so we allow anyone to read, add and

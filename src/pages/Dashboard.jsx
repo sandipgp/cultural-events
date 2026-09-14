@@ -43,6 +43,7 @@ export default function Dashboard() {
       title: 'Program Winners',
       desc: 'Announced results',
       over: true,
+      accent: 'gold',
     })
   }
   if (contestOver || eventsOver) {
@@ -52,18 +53,27 @@ export default function Dashboard() {
       title: 'Photo Winners',
       desc: 'Contest results',
       over: true,
+      accent: 'gold',
     })
   }
+
+  // Once the event is over, show only the still-active tiles (hide the rest).
+  const visibleTiles = eventsOver ? tiles.filter((t) => t.over) : tiles
 
   return (
     <div className="screen dash">
       <AppHeader />
 
-      <div className="intro card">
-        <h2>Ganeshotsav Cultural Events</h2>
-        <p>
-          Welcome! Schedule your Aarti, join the cultural programs, and see
-          what's happening across the festival. 🌼
+      <div className="hero card">
+        <div className="hero-glow hero-glow-a" />
+        <div className="hero-glow hero-glow-b" />
+        <div className="hero-emblem">
+          <img src="/hero-modak.svg" alt="" />
+        </div>
+        <h2 className="hero-title">Ganeshotsav Cultural Events</h2>
+        <p className="hero-sub">
+          Aarti bookings, cultural programs &amp; the event schedule — all in
+          one place. 🌼
         </p>
       </div>
 
@@ -74,31 +84,30 @@ export default function Dashboard() {
       )}
 
       {eventsOver && (
-        <p className="over-note">
-          🙏 The event is over. Thank you for participating!
-        </p>
+        <div className="over-hero card">
+          <div className="over-emoji">🙏</div>
+          <h2>The event is over</h2>
+          <p>
+            Thank you for celebrating Ganeshotsav with us! Explore the winners
+            and participants below. 🌺
+          </p>
+        </div>
       )}
 
-      <div className="tiles">
-        {tiles.map((t) => {
-          const disabled = eventsOver && !t.over
-          if (disabled) {
-            return (
-              <div key={t.to} className="tile card disabled" aria-disabled="true">
-                <span className="tile-icon">{t.icon}</span>
-                <strong>{t.title}</strong>
-                <span className="tile-desc">{t.desc}</span>
-              </div>
-            )
-          }
-          return (
-            <Link key={t.to} to={t.to} className="tile card">
-              <span className="tile-icon">{t.icon}</span>
+      <div className={`tiles ${eventsOver ? 'featured' : ''}`}>
+        {visibleTiles.map((t) => (
+          <Link
+            key={t.to}
+            to={t.to}
+            className={`tile card ${t.accent === 'gold' ? 'gold' : ''}`}
+          >
+            <span className="tile-icon">{t.icon}</span>
+            <span className="tile-text">
               <strong>{t.title}</strong>
               <span className="tile-desc">{t.desc}</span>
-            </Link>
-          )
-        })}
+            </span>
+          </Link>
+        ))}
       </div>
 
       <p className="foot">

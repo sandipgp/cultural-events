@@ -50,8 +50,8 @@ img { max-width: 100%; display: block; }
   padding: 10px 4px 18px;
 }
 .logo {
-  width: 46px;
-  height: 46px;
+  width: 50px;
+  height: 50px;
   display: grid;
   place-items: center;
   font-size: 26px;
@@ -63,7 +63,7 @@ img { max-width: 100%; display: block; }
 .logo { overflow: hidden; }
 .logo img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
 .logo-text { display: flex; flex-direction: column; line-height: 1.15; }
-.logo-text strong { font-size: 17px; color: var(--brand); }
+.logo-text strong { font-size: 20px; color: var(--brand); }
 .logo-text span { font-size: 12px; color: var(--muted); }
 .badge-btn {
   margin-left: auto;
@@ -96,7 +96,7 @@ img { max-width: 100%; display: block; }
 }
 .intro h2 {
   margin: 6px 0 8px;
-  font-size: 20px;
+  font-size: 19px;
   background: linear-gradient(90deg, var(--brand), var(--brand-2));
   -webkit-background-clip: text;
   background-clip: text;
@@ -140,6 +140,7 @@ img { max-width: 100%; display: block; }
 .form { display: flex; flex-direction: column; gap: 16px; }
 .field { display: flex; flex-direction: column; gap: 7px; }
 .field > span { font-size: 13px; font-weight: 600; color: var(--ink); }
+.char-count { font-size: 11px; font-weight: 500; color: var(--muted); text-align: right; }
 
 input[type="text"],
 input[type="password"],
@@ -341,11 +342,36 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
   z-index: 1;
 }
 .gcard-name { font-size: 14px; font-weight: 700; line-height: 1.2; }
+.gcard-nf {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
 .gcard-flat {
   font-size: 12px;
   font-weight: 600;
   color: #ffd9b0;
   letter-spacing: 0.3px;
+}
+.gcard-nf .gcard-flat::before {
+  content: "•";
+  margin-right: 5px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 700;
+}
+.gcard-desc {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.92;
+  line-height: 1.3;
+  margin-top: 3px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .gcard .btn { margin: 10px 10px 0; }
 .gcard-admin {
@@ -403,8 +429,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 
 .foot {
   text-align: center;
-  color: var(--muted);
-  font-size: 12px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
   margin-top: 22px;
 }
 .foot a { color: var(--brand); font-weight: 600; }
@@ -419,9 +447,100 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 
 /* Tighter vertical rhythm on the dashboard */
 .dash .app-header { padding-bottom: 12px; }
-.dash .intro { padding: 16px 18px; margin-bottom: 12px; }
-.dash .intro h2 { margin: 0 0 4px; font-size: 19px; }
-.dash .intro p { font-size: 13px; }
+
+/* ---------- Dashboard festive hero ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 26px 20px 22px;
+  background: radial-gradient(130% 110% at 50% -10%, #fff3d6 0%, #ffe7f3 55%, #ffdcef 100%);
+  border: 1px solid var(--line);
+}
+.hero-glow {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  filter: blur(38px);
+  opacity: 0.45;
+  z-index: 0;
+  pointer-events: none;
+}
+.hero-glow-a { background: var(--brand-2); top: -60px; left: -40px; }
+.hero-glow-b { background: var(--brand); bottom: -70px; right: -40px; }
+
+.hero-emblem {
+  position: relative;
+  z-index: 1;
+  width: 78px;
+  height: 78px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.9),
+    0 0 0 6px rgba(224, 169, 32, 0.55),
+    0 10px 28px rgba(224, 169, 32, 0.6);
+  animation: hero-float 4.5s ease-in-out infinite;
+}
+.hero-emblem img { width: 100%; height: 100%; border-radius: 50%; }
+
+.hero-title {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  /* Deep plum ends with a warm highlight sweeping through — stays high-contrast
+     on the light hero, with the bright bit gliding across as a highlight. */
+  background: linear-gradient(90deg, #5e1145, #a01a80, #f97316, #a01a80, #5e1145);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 1px 1px rgba(94, 17, 69, 0.22));
+  animation: hero-shimmer 5s linear infinite;
+}
+.hero-sub {
+  position: relative;
+  z-index: 1;
+  margin: 7px auto 0;
+  max-width: 320px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes hero-shimmer {
+  to { background-position: 220% center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-emblem, .hero-title { animation: none; }
+}
+
+.dash .intro {
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  background: linear-gradient(135deg, #fff4de, #ffe7f3);
+  border: 1px solid var(--line);
+  box-shadow: 0 6px 18px rgba(160, 40, 120, 0.08);
+}
+.dash .intro h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.dash .intro p { font-size: 13px; color: var(--muted); }
 .dash .admin-settings-btn { margin-bottom: 12px; padding: 11px 14px; }
 .dash .over-note { margin-bottom: 12px; }
 .dash .foot { margin-top: 14px; }
@@ -436,6 +555,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
   text-decoration: none;
   color: var(--ink);
   border: 1px solid var(--line);
+  background: linear-gradient(150deg, #fff8fc 0%, #ffeef7 55%, #fff2ea 100%);
   box-shadow: 0 4px 14px rgba(160, 40, 120, 0.07);
   transition: transform 0.08s, box-shadow 0.15s, border-color 0.15s;
 }
@@ -445,14 +565,45 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
   font-size: 22px;
   width: 44px;
   height: 44px;
+  flex: 0 0 auto;
   display: grid;
   place-items: center;
   border-radius: 13px;
   background: linear-gradient(135deg, #fff0f8, #ffe9d6);
   margin-bottom: 2px;
 }
+.tile-text { display: flex; flex-direction: column; gap: 2px; align-items: center; }
 .tile strong { color: var(--brand); font-size: 14px; }
 .tile-desc { font-size: 11.5px; color: var(--muted); }
+
+/* Gold-accent tiles (winners) */
+.tile.gold { border-color: #f0dca8; background: linear-gradient(180deg, #fffdf7, #fff); }
+.tile.gold .tile-icon { background: linear-gradient(135deg, #ffe89a, #f6a81f); }
+.tile.gold strong { color: #a5670c; }
+.tile.gold:hover { border-color: var(--gold); box-shadow: 0 8px 20px rgba(224, 169, 32, 0.22); }
+
+/* Featured layout (shown when the event is over): big horizontal cards */
+.tiles.featured { grid-template-columns: 1fr; gap: 12px; }
+.tiles.featured .tile {
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  gap: 14px;
+  padding: 16px 18px;
+}
+.tiles.featured .tile-icon { width: 52px; height: 52px; font-size: 26px; border-radius: 15px; margin: 0; }
+.tiles.featured .tile-text { align-items: flex-start; }
+.tiles.featured .tile strong { font-size: 16px; }
+.tiles.featured .tile-desc { font-size: 12.5px; }
+.tiles.featured .tile::after {
+  content: "›";
+  margin-left: auto;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--brand);
+  opacity: 0.5;
+}
+.tiles.featured .tile.gold::after { color: var(--gold); }
 .tile.disabled {
   opacity: 0.45;
   filter: grayscale(0.7);
@@ -462,17 +613,25 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 .tile.disabled strong { color: var(--muted); }
 
 .admin-settings-btn { width: 100%; margin-bottom: 16px; }
-.over-note {
+/* Highlighted "event over" thank-you card */
+.over-hero {
   text-align: center;
-  background: #fff3d6;
-  border: 1px solid #f0dca8;
-  color: #8a5a00;
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 16px;
+  padding: 24px 20px;
+  background: radial-gradient(130% 110% at 50% -10%, #fff2cf 0%, #ffe3d0 55%, #ffd9ec 100%);
+  border: 1px solid #f3d29a;
+  box-shadow: 0 8px 22px rgba(224, 169, 32, 0.25);
 }
+.over-emoji { font-size: 42px; line-height: 1; }
+.over-hero h2 {
+  margin: 8px 0 4px;
+  font-size: 21px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.over-hero p { margin: 0 auto; max-width: 340px; font-size: 13.5px; line-height: 1.5; color: var(--ink); }
 
 /* App settings modal rows */
 .setting-row {
@@ -485,10 +644,48 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 }
 .setting-row:first-of-type { border-top: none; }
 .setting-row .btn { flex: 0 0 auto; }
+.date-input {
+  width: auto;
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  font-size: 13px;
+  background: #fffafd;
+  color: var(--ink);
+  font-family: inherit;
+}
 
 .card-title { margin: 0 0 6px; color: var(--brand); font-size: 16px; }
 .manage-links-title { margin: 4px 0 10px; text-align: center; }
-.logout-btn { width: 100%; }
+.logout-btn { width: 100%; margin-top: 20px; }
+
+/* Toggle switch (manage settings) */
+.switch {
+  position: relative;
+  flex: 0 0 auto;
+  width: 48px;
+  height: 27px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: #e6d3e0;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.switch.on { background: linear-gradient(135deg, var(--brand), var(--brand-2)); }
+.switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+  transition: transform 0.18s;
+}
+.switch.on .switch-knob { transform: translateX(21px); }
 .manage-link {
   display: inline-block;
   margin-top: 8px;

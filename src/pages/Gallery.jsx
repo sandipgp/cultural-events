@@ -4,6 +4,7 @@ import { supabase, PHOTO_BUCKET } from '../supabaseClient.js'
 import { useContestOver } from '../lib/settings.js'
 import { useAdmin } from '../lib/admin.jsx'
 import AppHeader from '../components/AppHeader.jsx'
+import AppFooter from '../components/AppFooter.jsx'
 
 export default function Gallery() {
   const { isAdmin } = useAdmin()
@@ -74,7 +75,10 @@ export default function Gallery() {
 
       <div className="gallery-bar">
         <Link className="btn ghost small" to="/">
-          ← Add photo
+          ← Dashboard
+        </Link>
+        <Link className="btn ghost small" to="/photo">
+          + Add photo
         </Link>
         {contestOver && (
           <Link className="btn ghost small" to="/winners">
@@ -127,8 +131,13 @@ export default function Gallery() {
                 ⤢
               </a>
               <div className="gcard-strip">
-                <strong className="gcard-name">{row.name}</strong>
-                <span className="gcard-flat">Flat {row.flat_number}</span>
+                <div className="gcard-nf">
+                  <strong className="gcard-name">{row.name}</strong>
+                  <span className="gcard-flat">{row.flat_number}</span>
+                </div>
+                {row.description && (
+                  <span className="gcard-desc">{row.description}</span>
+                )}
               </div>
             </div>
             {isAdmin && (
@@ -152,7 +161,7 @@ export default function Gallery() {
         ))}
       </div>
 
-      <p className="foot">Ganpati Bappa Morya 🌺</p>
+      <AppFooter />
 
       {pendingDelete && (
         <div className="modal-backdrop" onClick={() => !removing && setPendingDelete(null)}>

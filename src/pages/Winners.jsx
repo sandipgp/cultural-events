@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient.js'
 import { useContestOver } from '../lib/settings.js'
+import AppFooter from '../components/AppFooter.jsx'
 
 export default function Winners() {
   const { over: contestOver } = useContestOver()
@@ -50,7 +51,7 @@ export default function Winners() {
             View all photos
           </Link>
         </div>
-        <p className="foot">Ganpati Bappa Morya 🌺</p>
+        <AppFooter />
       </div>
     )
   }
@@ -119,7 +120,7 @@ export default function Winners() {
         </Link>
       </div>
 
-      <p className="foot">Ganpati Bappa Morya 🌺</p>
+      <AppFooter />
     </div>
   )
 }

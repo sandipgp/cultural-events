@@ -1,37 +1,35 @@
-// Submission deadline, driven by VITE_LAST_DATE in .env.local.
-// Accepts human dates like "15 September 2026" or ISO "2026-09-15".
-// Submissions stay OPEN through the END of that day (local time) and close
-// after it — so the last date is genuinely the last day you can submit.
+// Submission-deadline helpers. The date itself is now admin-managed (stored in
+// app_settings; see settings.js). VITE_LAST_DATE / VITE_CONTEST_OVER remain
+// only as initial defaults when nothing has been set in the database.
+// Dates accept human ("15 Sep 2026") or ISO ("2026-09-15") formats.
 
-const RAW = (import.meta.env.VITE_LAST_DATE || '').trim()
+// Env defaults / fallbacks.
+export const LAST_DATE_LABEL = (import.meta.env.VITE_LAST_DATE || '').trim()
+export const ENV_CONTEST_OVER = (import.meta.env.VITE_CONTEST_OVER || '').trim()
 
-// The label we show in the UI (kept exactly as typed in the env file).
-export const LAST_DATE_LABEL = RAW
-
-function parseDeadlineEnd(raw) {
-  if (!raw) return null
-  const d = new Date(raw)
-  if (isNaN(d.getTime())) return null
-  d.setHours(23, 59, 59, 999) // end of the deadline day, local time
-  return d
+// True if `now` is past the END of the given day (local time). Blank/unparseable
+// dates are treated as "not past" (never auto-close).
+export function isPastDateLabel(label, now = new Date()) {
+  if (!label) return false
+  const d = new Date(label)
+  if (isNaN(d.getTime())) return false
+  d.setHours(23, 59, 59, 999)
+  return now.getTime() > d.getTime()
 }
 
-// null when no valid date is configured (then submissions never auto-close).
-export const DEADLINE_END = parseDeadlineEnd(RAW)
-
-export function isSubmissionClosed(now = new Date()) {
-  if (!DEADLINE_END) return false
-  return now.getTime() > DEADLINE_END.getTime()
+// Friendly display, e.g. "17 Sep 2026". Returns the raw string if unparseable.
+export function formatDateLabel(label) {
+  if (!label) return ''
+  const d = new Date(label)
+  if (isNaN(d.getTime())) return label
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-// Manual master switch from .env.local: VITE_CONTEST_OVER
-//   "1" -> contest is over (submissions closed, winners shown)
-//   "0" -> force open (submissions open, winners hidden), ignoring the date
-//   unset/other -> fall back to the deadline date above
-const CONTEST_OVER_FLAG = (import.meta.env.VITE_CONTEST_OVER || '').trim()
-
-export function isContestOver(now = new Date()) {
-  if (CONTEST_OVER_FLAG === '1') return true
-  if (CONTEST_OVER_FLAG === '0') return false
-  return isSubmissionClosed(now)
+// For a native <input type="date"> value (YYYY-MM-DD in local time).
+export function toDateInputValue(label) {
+  if (!label) return ''
+  const d = new Date(label)
+  if (isNaN(d.getTime())) return ''
+  const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+  return local.toISOString().slice(0, 10)
 }
