@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient.js'
 import { FLAT_LIST } from '../lib/flats.js'
 import { AARTI_DATES, SLOTS } from '../lib/festival.js'
 import AppHeader from '../components/AppHeader.jsx'
+import AppFooter from '../components/AppFooter.jsx'
 
 export default function AartiForm() {
   const [name, setName] = useState('')
@@ -165,6 +166,8 @@ export default function AartiForm() {
           </div>
         </div>
       )}
+
+      <AppFooter />
     </div>
   )
 }

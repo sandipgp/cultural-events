@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient.js'
 import { PROGRAMS, AGE_GROUPS } from '../lib/festival.js'
 import AppHeader from '../components/AppHeader.jsx'
+import AppFooter from '../components/AppFooter.jsx'
 
 const OTHER = 'Other'
 const OPTIONS = [...PROGRAMS, OTHER]
@@ -151,6 +152,8 @@ export default function ProgramForm() {
           View participants →
         </Link>
       </form>
+
+      <AppFooter />
     </div>
   )
 }

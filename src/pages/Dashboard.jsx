@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient.js'
 import { useContestOver, useEventsOver } from '../lib/settings.js'
 import { useAdmin } from '../lib/admin.jsx'
 import AppHeader from '../components/AppHeader.jsx'
+import AppFooter from '../components/AppFooter.jsx'
 
 // `over: true` = tile stays active even when the event is marked over.
 const TILES = [
@@ -110,9 +111,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <p className="foot">
-        Ganpati Bappa Morya 🌺
-      </p>
+      <AppFooter />
     </div>
   )
 }

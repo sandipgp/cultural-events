@@ -41,6 +41,8 @@ img { max-width: 100%; display: block; }
 }
 /* Gallery / winners can use the full screen so landscape fits more columns. */
 .screen.wide { max-width: 1000px; }
+/* Dashboard aims to fit on one screen — trim the outer padding a touch. */
+.screen.dash { padding-top: 12px; padding-bottom: 20px; }
 
 /* ---------- Header ---------- */
 .app-header {
@@ -453,7 +455,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
   position: relative;
   overflow: hidden;
   text-align: center;
-  padding: 26px 20px 22px;
+  padding: 16px 18px 14px;
+  margin-bottom: 12px;
   background: radial-gradient(130% 110% at 50% -10%, #fff3d6 0%, #ffe7f3 55%, #ffdcef 100%);
   border: 1px solid var(--line);
 }
@@ -473,9 +476,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 .hero-emblem {
   position: relative;
   z-index: 1;
-  width: 78px;
-  height: 78px;
-  margin: 0 auto 12px;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 8px;
   border-radius: 50%;
   box-shadow:
     0 0 0 3px rgba(255, 255, 255, 0.9),
@@ -489,7 +492,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
   position: relative;
   z-index: 1;
   margin: 0;
-  font-size: 22px;
+  font-size: 19px;
   font-weight: 800;
   letter-spacing: 0.2px;
   /* Deep plum ends with a warm highlight sweeping through — stays high-contrast
@@ -506,10 +509,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 .hero-sub {
   position: relative;
   z-index: 1;
-  margin: 7px auto 0;
-  max-width: 320px;
-  font-size: 13px;
-  line-height: 1.5;
+  margin: 4px auto 0;
+  max-width: 300px;
+  font-size: 12.5px;
+  line-height: 1.45;
   color: var(--muted);
 }
 
@@ -541,16 +544,16 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
   color: transparent;
 }
 .dash .intro p { font-size: 13px; color: var(--muted); }
-.dash .admin-settings-btn { margin-bottom: 12px; padding: 11px 14px; }
+.dash .admin-settings-btn { margin-bottom: 10px; padding: 10px 14px; }
 .dash .over-note { margin-bottom: 12px; }
-.dash .foot { margin-top: 14px; }
+.dash .foot { margin-top: 12px; }
 .tile {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 6px;
-  padding: 16px 12px;
+  gap: 5px;
+  padding: 13px 10px;
   margin: 0;
   text-decoration: none;
   color: var(--ink);
@@ -562,13 +565,13 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 .tile:active { transform: scale(0.97); }
 .tile:hover { border-color: #f0c4e4; box-shadow: 0 8px 20px rgba(160, 40, 120, 0.12); }
 .tile-icon {
-  font-size: 22px;
-  width: 44px;
-  height: 44px;
+  font-size: 20px;
+  width: 40px;
+  height: 40px;
   flex: 0 0 auto;
   display: grid;
   place-items: center;
-  border-radius: 13px;
+  border-radius: 12px;
   background: linear-gradient(135deg, #fff0f8, #ffe9d6);
   margin-bottom: 2px;
 }

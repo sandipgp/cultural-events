@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient.js'
 import { AARTI_DATES, SLOTS, dateIndex, slotIndex } from '../lib/festival.js'
 import { useAdmin } from '../lib/admin.jsx'
 import AppHeader from '../components/AppHeader.jsx'
+import AppFooter from '../components/AppFooter.jsx'
 
 export default function AartiList() {
   const { isAdmin } = useAdmin()
@@ -206,6 +207,8 @@ export default function AartiList() {
           </div>
         </div>
       )}
+
+      <AppFooter />
     </div>
   )
 }

@@ -4,6 +4,7 @@ import { useAdmin } from '../lib/admin.jsx'
 import { useContestOver, useEventsOver, useLastDate } from '../lib/settings.js'
 import { formatDateLabel, toDateInputValue } from '../lib/deadline.js'
 import AppHeader from '../components/AppHeader.jsx'
+import AppFooter from '../components/AppFooter.jsx'
 
 const LINKS = [
   { to: '/aarti/list', icon: '📋', title: 'Aarti Schedule' },
@@ -181,6 +182,8 @@ export default function Manage() {
           </div>
         </div>
       )}
+
+      <AppFooter />
     </div>
   )
 }

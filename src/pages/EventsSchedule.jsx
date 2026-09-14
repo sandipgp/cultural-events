@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient.js'
 import { AARTI_DATES, dateIndex } from '../lib/festival.js'
 import { useAdmin } from '../lib/admin.jsx'
 import AppHeader from '../components/AppHeader.jsx'
+import AppFooter from '../components/AppFooter.jsx'
 
 const EMPTY = { title: '', event_date: AARTI_DATES[0], event_time: '', description: '' }
 
@@ -220,6 +221,8 @@ export default function EventsSchedule() {
           </div>
         </div>
       )}
+
+      <AppFooter />
     </div>
   )
 }

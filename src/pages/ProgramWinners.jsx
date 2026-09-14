@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient.js'
 import AppHeader from '../components/AppHeader.jsx'
+import AppFooter from '../components/AppFooter.jsx'
 
 export default function ProgramWinners() {
   const [rows, setRows] = useState([])
@@ -88,7 +89,7 @@ export default function ProgramWinners() {
         </div>
       )}
 
-      <p className="foot">Ganpati Bappa Morya 🌺</p>
+      <AppFooter />
     </div>
   )
 }

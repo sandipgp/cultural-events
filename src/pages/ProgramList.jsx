@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient.js'
 import { PROGRAMS, AGE_GROUPS } from '../lib/festival.js'
 import { useAdmin } from '../lib/admin.jsx'
 import AppHeader from '../components/AppHeader.jsx'
+import AppFooter from '../components/AppFooter.jsx'
 
 export default function ProgramList() {
   const { isAdmin } = useAdmin()
@@ -264,6 +265,8 @@ export default function ProgramList() {
           </div>
         </div>
       )}
+
+      <AppFooter />
     </div>
   )
 }
