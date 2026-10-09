@@ -5,6 +5,7 @@ import { FLAT_LIST } from '../lib/flats.js'
 import { detectAiPhoto, AI_CHECK_ENABLED } from '../lib/aiDetect.js'
 import { formatDateLabel } from '../lib/deadline.js'
 import { useContestOver, useLastDate } from '../lib/settings.js'
+import { useFestival, useModules } from '../lib/festivalContext.jsx'
 import AppHeader from '../components/AppHeader.jsx'
 import AppFooter from '../components/AppFooter.jsx'
 
@@ -20,6 +21,10 @@ const MAX_BYTES = MAX_MB * 1024 * 1024
 const MAX_DESC = 50
 
 export default function Submit() {
+  const { festival } = useFestival()
+  const festivalId = festival?.id
+  const festivalSlug = festival?.slug
+  const { contest } = useModules()
   const { over: contestOver } = useContestOver()
   const { label: lastDate } = useLastDate()
   const [name, setName] = useState('')
@@ -63,13 +68,15 @@ export default function Submit() {
     if (!name.trim()) return setError('Please enter your name.')
     if (!flat) return setError('Please select your flat number.')
     if (!file) return setError('Please upload one photo.')
+    if (!festivalId) return setError('Still loading — please try again in a moment.')
 
     if (AI_CHECK_ENABLED) setStatus(STATUS.ANALYZING)
 
-    // Is there already a submission for this flat? (We'll confirm replacement.)
+    // Is there already a submission for this flat (this festival)? Confirm replace.
     const { data: existing, error: checkErr } = await supabase
       .from('submissions')
       .select('id')
+      .eq('festival_id', festivalId)
       .eq('flat_number', flat)
       .maybeSingle()
 
@@ -93,9 +100,9 @@ export default function Submit() {
     setError('')
 
     try {
-      // Deterministic path per flat => re-uploading overwrites the same object,
-      // so a flat never ends up with more than one photo.
-      const path = `flat-${flat}`
+      // Deterministic path per flat, namespaced by festival => re-uploading
+      // overwrites the same object, and festivals never collide.
+      const path = `${festivalSlug || 'event'}/flat-${flat}`
 
       const { error: upErr } = await supabase.storage
         .from(PHOTO_BUCKET)
@@ -109,6 +116,7 @@ export default function Submit() {
         .from('submissions')
         .upsert(
           {
+            festival_id: festivalId,
             name: name.trim(),
             flat_number: flat,
             photo_path: path,
@@ -117,7 +125,7 @@ export default function Submit() {
             description: description.trim() || null,
             updated_at: now,
           },
-          { onConflict: 'flat_number' }
+          { onConflict: 'festival_id,flat_number' }
         )
       if (rowErr) throw rowErr
 
@@ -192,7 +200,7 @@ export default function Submit() {
 
       <div className="intro card">
         <GaneshImage />
-        <h2>Ganpati Decoration Photo Contest</h2>
+        <h2>{contest.label}</h2>
         <ul className="rules">
           <li>Only <strong>1 photo</strong> allowed per flat</li>
           <li><strong>No AI filters</strong> — such photos will be rejected from the contest</li>

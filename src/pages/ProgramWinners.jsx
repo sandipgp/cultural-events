@@ -1,20 +1,26 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient.js'
+import { useFestival, useModules } from '../lib/festivalContext.jsx'
 import AppHeader from '../components/AppHeader.jsx'
 import AppFooter from '../components/AppFooter.jsx'
 
 export default function ProgramWinners() {
+  const { festival } = useFestival()
+  const festivalId = festival?.id
+  const { participation } = useModules()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
+    if (!festivalId) return
     let active = true
     ;(async () => {
       const { data, error } = await supabase
         .from('program_participants')
         .select('*')
+        .eq('festival_id', festivalId)
         .eq('is_winner', true)
         .order('age_group', { ascending: true })
       if (!active) return
@@ -25,16 +31,16 @@ export default function ProgramWinners() {
     return () => {
       active = false
     }
-  }, [])
+  }, [festivalId])
 
   return (
     <div className="screen">
-      <AppHeader title="Program Winners" />
+      <AppHeader title={`${participation.label} Winners`} />
 
       <div className="winners-hero card">
         <div className="winners-emoji">🎉 🏆 🎉</div>
         <h2>Congratulations!</h2>
-        <p>Winners of the cultural programs</p>
+        <p>Winners of the {participation.label}</p>
       </div>
 
       <div className="page-bar">

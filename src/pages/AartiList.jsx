@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient.js'
-import { AARTI_DATES, SLOTS, dateIndex, slotIndex } from '../lib/festival.js'
 import { useAdmin } from '../lib/admin.jsx'
+import { useFestival, useModules } from '../lib/festivalContext.jsx'
 import AppHeader from '../components/AppHeader.jsx'
 import AppFooter from '../components/AppFooter.jsx'
 
 export default function AartiList() {
   const { isAdmin } = useAdmin()
+  const { festival } = useFestival()
+  const festivalId = festival?.id
+  const { rota } = useModules()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -16,14 +19,18 @@ export default function AartiList() {
   const [busy, setBusy] = useState(false)
 
   async function load() {
+    if (!festivalId) return
     setLoading(true)
-    const { data, error } = await supabase.from('aarti_schedule').select('*')
+    const { data, error } = await supabase
+      .from('aarti_schedule')
+      .select('*')
+      .eq('festival_id', festivalId)
     if (error) setError(error.message)
     else {
       const sorted = (data || []).sort(
         (a, b) =>
-          dateIndex(a.aarti_date) - dateIndex(b.aarti_date) ||
-          slotIndex(a.slot) - slotIndex(b.slot) ||
+          rota.dates.indexOf(a.aarti_date) - rota.dates.indexOf(b.aarti_date) ||
+          rota.slots.indexOf(a.slot) - rota.slots.indexOf(b.slot) ||
           a.flat_number.localeCompare(b.flat_number)
       )
       setRows(sorted)
@@ -33,7 +40,7 @@ export default function AartiList() {
 
   useEffect(() => {
     load()
-  }, [])
+  }, [festivalId])
 
   async function saveEdit() {
     setBusy(true)
@@ -73,17 +80,17 @@ export default function AartiList() {
           ← Dashboard
         </Link>
         <Link className="btn ghost small" to="/aarti">
-          + Book Aarti
+          + Book {rota.label}
         </Link>
         <span className="count">{rows.length} booked</span>
       </div>
 
-      <h2 className="page-title">Aarti Schedule</h2>
+      <h2 className="page-title">{rota.label} Schedule</h2>
 
       {error && <p className="error center">{error}</p>}
       {loading && <p className="muted center">Loading…</p>}
       {!loading && rows.length === 0 && (
-        <p className="muted center">No Aarti booked yet.</p>
+        <p className="muted center">No {rota.label} booked yet.</p>
       )}
 
       {!loading && rows.length > 0 && (
@@ -140,7 +147,7 @@ export default function AartiList() {
       {editing && (
         <div className="modal-backdrop" onClick={() => !busy && setEditing(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Edit Aarti — Flat {editing.flat_number}</h3>
+            <h3>Edit {rota.label} — Flat {editing.flat_number}</h3>
             <label className="field">
               <span>Name</span>
               <input
@@ -155,7 +162,7 @@ export default function AartiList() {
                 value={editing.aarti_date}
                 onChange={(e) => setEditing({ ...editing, aarti_date: e.target.value })}
               >
-                {AARTI_DATES.map((d) => (
+                {rota.dates.map((d) => (
                   <option key={d} value={d}>
                     {d}
                   </option>
@@ -168,7 +175,7 @@ export default function AartiList() {
                 value={editing.slot}
                 onChange={(e) => setEditing({ ...editing, slot: e.target.value })}
               >
-                {SLOTS.map((s) => (
+                {rota.slots.map((s) => (
                   <option key={s} value={s}>
                     {s}
                   </option>
@@ -193,7 +200,7 @@ export default function AartiList() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3>Delete booking?</h3>
             <p>
-              Remove <strong>{pendingDelete.name}</strong>'s Aarti (Flat{' '}
+              Remove <strong>{pendingDelete.name}</strong>'s {rota.label} (Flat{' '}
               {pendingDelete.flat_number})?
             </p>
             <div className="modal-actions">

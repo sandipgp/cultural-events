@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AdminProvider } from './lib/admin.jsx'
+import { FestivalProvider } from './lib/festivalContext.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import AartiForm from './pages/AartiForm.jsx'
 import AartiList from './pages/AartiList.jsx'
@@ -10,6 +11,8 @@ import ProgramList from './pages/ProgramList.jsx'
 import ProgramWinners from './pages/ProgramWinners.jsx'
 import EventsSchedule from './pages/EventsSchedule.jsx'
 import Manage from './pages/Manage.jsx'
+import ManageEvents from './pages/ManageEvents.jsx'
+import ManageTheme from './pages/ManageTheme.jsx'
 import Submit from './pages/Submit.jsx'
 import Gallery from './pages/Gallery.jsx'
 import Winners from './pages/Winners.jsx'
@@ -18,6 +21,7 @@ import './index.css'
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AdminProvider>
+      <FestivalProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Dashboard />} />
@@ -28,6 +32,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/program/winners" element={<ProgramWinners />} />
           <Route path="/events" element={<EventsSchedule />} />
           <Route path="/manage" element={<Manage />} />
+          <Route path="/manage/event" element={<ManageEvents />} />
+          <Route path="/manage/theme" element={<ManageTheme />} />
           {/* Photo contest (kept alongside the events app) */}
           <Route path="/photo" element={<Submit />} />
           <Route path="/gallery" element={<Gallery />} />
@@ -35,6 +41,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
+      </FestivalProvider>
     </AdminProvider>
   </React.StrictMode>
 )

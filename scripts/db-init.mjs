@@ -39,7 +39,14 @@ if (!url) {
 }
 
 // These are safe to re-run (create ... if not exists / drop policy if exists).
-const files = ['supabase-setup.sql', 'supabase-events-setup.sql']
+// Order matters: base feature tables, then the festivals table, then the
+// migration that adds festival_id to those tables.
+const files = [
+  'supabase-setup.sql',
+  'supabase-events-setup.sql',
+  'supabase-festivals-setup.sql',
+  'supabase-festival-scope.sql',
+]
 
 // Drop any sslmode/query params from the URL — newer pg reads sslmode=require
 // as verify-full and rejects Supabase's cert chain. We set SSL explicitly below.

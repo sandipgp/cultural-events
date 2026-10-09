@@ -1,0 +1,222 @@
+'use client'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { supabase } from '@/lib/supabaseClient.js'
+import { useAdmin } from '@/lib/admin.jsx'
+import { useFestival, useModules } from '@/lib/festivalContext.jsx'
+import AppHeader from '@/components/AppHeader.jsx'
+import AppFooter from '@/components/AppFooter.jsx'
+
+export default function AartiList() {
+  const { isAdmin } = useAdmin()
+  const { festival } = useFestival()
+  const festivalId = festival?.id
+  const { rota } = useModules()
+  const [rows, setRows] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [editing, setEditing] = useState(null) // row being edited
+  const [pendingDelete, setPendingDelete] = useState(null)
+  const [busy, setBusy] = useState(false)
+
+  async function load() {
+    if (!festivalId) return
+    setLoading(true)
+    const { data, error } = await supabase
+      .from('aarti_schedule')
+      .select('*')
+      .eq('festival_id', festivalId)
+    if (error) setError(error.message)
+    else {
+      const sorted = (data || []).sort(
+        (a, b) =>
+          rota.dates.indexOf(a.aarti_date) - rota.dates.indexOf(b.aarti_date) ||
+          rota.slots.indexOf(a.slot) - rota.slots.indexOf(b.slot) ||
+          a.flat_number.localeCompare(b.flat_number)
+      )
+      setRows(sorted)
+    }
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    load()
+  }, [festivalId])
+
+  async function saveEdit() {
+    setBusy(true)
+    const { error } = await supabase
+      .from('aarti_schedule')
+      .update({
+        name: editing.name.trim(),
+        aarti_date: editing.aarti_date,
+        slot: editing.slot,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', editing.id)
+    setBusy(false)
+    if (error) return setError(error.message)
+    setEditing(null)
+    load()
+  }
+
+  async function doDelete() {
+    setBusy(true)
+    const { error } = await supabase
+      .from('aarti_schedule')
+      .delete()
+      .eq('id', pendingDelete.id)
+    setBusy(false)
+    if (error) return setError(error.message)
+    setRows((prev) => prev.filter((r) => r.id !== pendingDelete.id))
+    setPendingDelete(null)
+  }
+
+  return (
+    <div className="screen">
+      <AppHeader />
+
+      <div className="page-bar">
+        <Link className="btn ghost small" href="/">
+          ← Dashboard
+        </Link>
+        <Link className="btn ghost small" href="/aarti">
+          + Book {rota.label}
+        </Link>
+        <span className="count">{rows.length} booked</span>
+      </div>
+
+      <h2 className="page-title">{rota.label} Schedule</h2>
+
+      {error && <p className="error center">{error}</p>}
+      {loading && <p className="muted center">Loading…</p>}
+      {!loading && rows.length === 0 && (
+        <p className="muted center">No {rota.label} booked yet.</p>
+      )}
+
+      {!loading && rows.length > 0 && (
+        <div className="table-wrap card">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>Flat</th>
+                <th>Name</th>
+                <th>Date &amp; Slot</th>
+                {isAdmin && <th className="tbl-actions-col">Actions</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id}>
+                  <td className="tbl-flat">{row.flat_number}</td>
+                  <td>{row.name}</td>
+                  <td>
+                    <div className="tbl-slot">
+                      <span>{row.aarti_date}</span>
+                      <span className={`chip ${row.slot === 'Evening' ? 'alt' : ''}`}>
+                        {row.slot}
+                      </span>
+                    </div>
+                  </td>
+                  {isAdmin && (
+                    <td>
+                      <div className="tbl-actions">
+                        <button className="btn small ghost" onClick={() => setEditing({ ...row })}>
+                          Edit
+                        </button>
+                        <button className="btn small danger" onClick={() => setPendingDelete(row)}>
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {!isAdmin && rows.length > 0 && (
+        <p className="foot">
+          To change your own booking, just{' '}
+          <Link href="/aarti">book again</Link> for your flat.
+        </p>
+      )}
+
+      {/* Admin: edit modal */}
+      {editing && (
+        <div className="modal-backdrop" onClick={() => !busy && setEditing(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Edit {rota.label} — Flat {editing.flat_number}</h3>
+            <label className="field">
+              <span>Name</span>
+              <input
+                type="text"
+                value={editing.name}
+                onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+              />
+            </label>
+            <label className="field">
+              <span>Date</span>
+              <select
+                value={editing.aarti_date}
+                onChange={(e) => setEditing({ ...editing, aarti_date: e.target.value })}
+              >
+                {rota.dates.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="field">
+              <span>Slot</span>
+              <select
+                value={editing.slot}
+                onChange={(e) => setEditing({ ...editing, slot: e.target.value })}
+              >
+                {rota.slots.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="modal-actions">
+              <button className="btn ghost" disabled={busy} onClick={() => setEditing(null)}>
+                Cancel
+              </button>
+              <button className="btn" disabled={busy} onClick={saveEdit}>
+                {busy ? 'Saving…' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Admin: delete confirm */}
+      {pendingDelete && (
+        <div className="modal-backdrop" onClick={() => !busy && setPendingDelete(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Delete booking?</h3>
+            <p>
+              Remove <strong>{pendingDelete.name}</strong>'s {rota.label} (Flat{' '}
+              {pendingDelete.flat_number})?
+            </p>
+            <div className="modal-actions">
+              <button className="btn ghost" disabled={busy} onClick={() => setPendingDelete(null)}>
+                Cancel
+              </button>
+              <button className="btn danger" disabled={busy} onClick={doDelete}>
+                {busy ? 'Deleting…' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <AppFooter />
+    </div>
+  )
+}

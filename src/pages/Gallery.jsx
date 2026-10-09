@@ -3,11 +3,15 @@ import { Link } from 'react-router-dom'
 import { supabase, PHOTO_BUCKET } from '../supabaseClient.js'
 import { useContestOver } from '../lib/settings.js'
 import { useAdmin } from '../lib/admin.jsx'
+import { useFestival, useModules } from '../lib/festivalContext.jsx'
 import AppHeader from '../components/AppHeader.jsx'
 import AppFooter from '../components/AppFooter.jsx'
 
 export default function Gallery() {
   const { isAdmin } = useAdmin()
+  const { festival } = useFestival()
+  const festivalId = festival?.id
+  const { contest } = useModules()
   const { over: contestOver, setContestOver } = useContestOver()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
@@ -16,10 +20,12 @@ export default function Gallery() {
   const [removing, setRemoving] = useState(false)
 
   async function load() {
+    if (!festivalId) return
     setLoading(true)
     const { data, error } = await supabase
       .from('submissions')
       .select('*')
+      .eq('festival_id', festivalId)
       .order('is_winner', { ascending: false })
       .order('created_at', { ascending: true })
     if (error) setError(error.message)
@@ -29,7 +35,7 @@ export default function Gallery() {
 
   useEffect(() => {
     load()
-  }, [])
+  }, [festivalId])
 
   async function toggleWinner(row) {
     const next = !row.is_winner
@@ -71,7 +77,7 @@ export default function Gallery() {
 
   return (
     <div className="screen wide">
-      <AppHeader title="Photo Gallery" />
+      <AppHeader title={`${contest.label} — Gallery`} />
 
       <div className="gallery-bar">
         <Link className="btn ghost small" to="/">

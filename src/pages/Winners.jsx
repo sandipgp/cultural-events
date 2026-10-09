@@ -2,21 +2,27 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient.js'
 import { useContestOver } from '../lib/settings.js'
+import { useFestival, useModules } from '../lib/festivalContext.jsx'
+import AppHeader from '../components/AppHeader.jsx'
 import AppFooter from '../components/AppFooter.jsx'
 
 export default function Winners() {
   const { over: contestOver } = useContestOver()
+  const { festival } = useFestival()
+  const festivalId = festival?.id
+  const { contest } = useModules()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (!contestOver) return // don't fetch winners until the contest is over
+    if (!contestOver || !festivalId) return // wait for contest-over + festival
     let active = true
     ;(async () => {
       const { data, error } = await supabase
         .from('submissions')
         .select('*')
+        .eq('festival_id', festivalId)
         .eq('is_winner', true)
         .order('flat_number', { ascending: true })
       if (!active) return
@@ -27,19 +33,13 @@ export default function Winners() {
     return () => {
       active = false
     }
-  }, [contestOver])
+  }, [contestOver, festivalId])
 
   // Winners are hidden until the contest is over (VITE_CONTEST_OVER / deadline).
   if (!contestOver) {
     return (
       <div className="screen">
-        <header className="app-header">
-          <div className="logo">🪔</div>
-          <div className="logo-text">
-            <strong>Contest Winners</strong>
-            <span>Ganeshotsav 2026</span>
-          </div>
-        </header>
+        <AppHeader title={`${contest.label} Winners`} />
         <div className="card thanks">
           <div className="thanks-mark">🌟</div>
           <h2>Not announced yet</h2>
@@ -58,18 +58,12 @@ export default function Winners() {
 
   return (
     <div className="screen wide">
-      <header className="app-header">
-        <div className="logo">🏆</div>
-        <div className="logo-text">
-          <strong>Contest Winners</strong>
-          <span>Ganeshotsav 2026</span>
-        </div>
-      </header>
+      <AppHeader title={`${contest.label} Winners`} />
 
       <div className="winners-hero card">
         <div className="winners-emoji">🎉 🏆 🎉</div>
         <h2>Congratulations!</h2>
-        <p>Winners of the Ganpati Decoration Photo Contest</p>
+        <p>Winners of the {contest.label}</p>
       </div>
 
       {error && <p className="error center">{error}</p>}

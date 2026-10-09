@@ -1,10 +1,32 @@
-# 🪔 Vivantalife Vedika · Ganeshotsav App
+# 🪔 Society Events App
 
-A mobile-first web app for the society's Ganeshotsav — Aarti scheduling,
-cultural program registrations, an events schedule, and a photo contest, all
-under one festive theme.
+A mobile-first, **multi-event** society platform (Ganpati, Navratri, Winter
+Sports, Kojagiri, …) with per-event theming, admin-managed events/modules,
+Aarti rota, program participation, a photo/media contest, and an events
+schedule — all on Supabase.
 
-Built with **React + Vite** and **Supabase** (Postgres database + file storage).
+> ### ➡️ The current app is in [`next-app/`](./next-app) (Next.js)
+>
+> The project has migrated to **Next.js (App Router)** — see
+> [`next-app/README.md`](./next-app/README.md) to run and deploy it. The
+> API routes there keep the Gemini key and festival writes server-side.
+>
+> **This top-level project (React + Vite, in [`src/`](./src)) is the previous
+> version.** It still works and shares the same Supabase database, but it will
+> be retired once the Next.js app is confirmed in production. New work should
+> go in `next-app/`.
+>
+> **Database SQL** (shared by both) lives at the repo root and is applied in
+> order via `npm run db:init`: `supabase-setup.sql`,
+> `supabase-events-setup.sql`, `supabase-festivals-setup.sql`,
+> `supabase-festival-scope.sql`. Optional hardening:
+> `supabase-festival-hardening.sql`.
+
+---
+
+## The Vite app (this folder)
+
+Built with **React + Vite** and **Supabase**. Same features as the Next.js app.
 
 ---
 

@@ -659,6 +659,50 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
   font-family: inherit;
 }
 
+/* Module editor blocks (/manage/event) */
+.mod-block {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #fffafd;
+}
+.mod-head { display: flex; align-items: center; justify-content: space-between; }
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.check-row input { width: auto; }
+
+/* Theme editor (/manage/theme) */
+.color-row { display: flex; gap: 14px; flex-wrap: wrap; }
+.color-pick { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); }
+.color-pick input[type="color"] {
+  width: 52px;
+  height: 40px;
+  padding: 2px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+}
+.theme-sample {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px;
+  border-radius: 12px;
+  background: #fff6fb;
+  border: 1px dashed var(--line);
+}
+.theme-sample .badge { position: static; }
+
 .card-title { margin: 0 0 6px; color: var(--brand); font-size: 16px; }
 .manage-links-title { margin: 4px 0 10px; text-align: center; }
 .logout-btn { width: 100%; margin-top: 20px; }

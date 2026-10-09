@@ -2,11 +2,14 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient.js'
 import { FLAT_LIST } from '../lib/flats.js'
-import { AARTI_DATES, SLOTS } from '../lib/festival.js'
+import { useFestival, useModules } from '../lib/festivalContext.jsx'
 import AppHeader from '../components/AppHeader.jsx'
 import AppFooter from '../components/AppFooter.jsx'
 
 export default function AartiForm() {
+  const { festival } = useFestival()
+  const festivalId = festival?.id
+  const { rota } = useModules()
   const [name, setName] = useState('')
   const [flat, setFlat] = useState('')
   const [date, setDate] = useState('')
@@ -22,11 +25,13 @@ export default function AartiForm() {
     if (!flat) return setError('Please select your flat.')
     if (!date) return setError('Please select a date.')
     if (!slot) return setError('Please select a slot.')
+    if (!festivalId) return setError('Still loading — please try again in a moment.')
 
-    // One Aarti booking per flat — if it exists, confirm the override.
+    // One Aarti booking per flat (per festival) — if it exists, confirm override.
     const { data: existing, error: checkErr } = await supabase
       .from('aarti_schedule')
       .select('id')
+      .eq('festival_id', festivalId)
       .eq('flat_number', flat)
       .maybeSingle()
     if (checkErr) return setError(checkErr.message)
@@ -43,13 +48,14 @@ export default function AartiForm() {
     setError('')
     const { error } = await supabase.from('aarti_schedule').upsert(
       {
+        festival_id: festivalId,
         name: name.trim(),
         flat_number: flat,
         aarti_date: date,
         slot,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: 'flat_number' }
+      { onConflict: 'festival_id,flat_number' }
     )
     if (error) {
       setStatus('idle')
@@ -64,13 +70,13 @@ export default function AartiForm() {
         <AppHeader />
         <div className="card thanks">
           <div className="thanks-mark">🪔</div>
-          <h2>Aarti booked!</h2>
+          <h2>{rota.label} booked!</h2>
           <p>
             Flat <strong>{flat}</strong> — <strong>{date}</strong>,{' '}
             <strong>{slot}</strong>. Thank you!
           </p>
           <Link className="btn" to="/aarti/list">
-            View Aarti schedule
+            View {rota.label} schedule
           </Link>
           <Link className="btn ghost" to="/">
             Back to dashboard
@@ -85,8 +91,8 @@ export default function AartiForm() {
       <AppHeader />
 
       <div className="intro card">
-        <h2>Schedule Aarti</h2>
-        <p>Pick a date and slot for your flat's Aarti. 🌼</p>
+        <h2>Schedule {rota.label}</h2>
+        <p>Pick a date and slot for your flat's {rota.label}. 🌼</p>
       </div>
 
       <form className="card form" onSubmit={handleSubmit}>
@@ -116,7 +122,7 @@ export default function AartiForm() {
           <span>Date</span>
           <select value={date} onChange={(e) => setDate(e.target.value)}>
             <option value="">Select a date…</option>
-            {AARTI_DATES.map((d) => (
+            {rota.dates.map((d) => (
               <option key={d} value={d}>
                 {d}
               </option>
@@ -128,7 +134,7 @@ export default function AartiForm() {
           <span>Slot</span>
           <select value={slot} onChange={(e) => setSlot(e.target.value)}>
             <option value="">Select a slot…</option>
-            {SLOTS.map((s) => (
+            {rota.slots.map((s) => (
               <option key={s} value={s}>
                 {s}
               </option>
@@ -139,11 +145,11 @@ export default function AartiForm() {
         {error && <p className="error">{error}</p>}
 
         <button className="btn" type="submit" disabled={status === 'saving'}>
-          {status === 'saving' ? 'Saving…' : 'Book Aarti'}
+          {status === 'saving' ? 'Saving…' : `Book ${rota.label}`}
         </button>
 
         <Link className="link-gallery" to="/aarti/list">
-          View Aarti schedule →
+          View {rota.label} schedule →
         </Link>
       </form>
 
@@ -152,8 +158,8 @@ export default function AartiForm() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3>Update your booking?</h3>
             <p>
-              Flat <strong>{flat}</strong> already has an Aarti booking. This
-              will <strong>replace</strong> it with {date}, {slot}.
+              Flat <strong>{flat}</strong> already has a {rota.label} booking.
+              This will <strong>replace</strong> it with {date}, {slot}.
             </p>
             <div className="modal-actions">
               <button className="btn ghost" onClick={() => setConfirmOpen(false)}>

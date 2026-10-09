@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient.js'
-import { AARTI_DATES, dateIndex } from '../lib/festival.js'
 import { useAdmin } from '../lib/admin.jsx'
+import { useFestival, useModules } from '../lib/festivalContext.jsx'
 import AppHeader from '../components/AppHeader.jsx'
 import AppFooter from '../components/AppFooter.jsx'
-
-const EMPTY = { title: '', event_date: AARTI_DATES[0], event_time: '', description: '' }
 
 // Turn free-text time ("7:00 PM", "10 AM", "18:30") into minutes since midnight
 // so events sort chronologically. Blank/unparseable times go last.
@@ -24,6 +22,11 @@ function timeToMinutes(t) {
 
 export default function EventsSchedule() {
   const { isAdmin } = useAdmin()
+  const { festival } = useFestival()
+  const festivalId = festival?.id
+  const { rota, schedule } = useModules()
+  const dates = rota.dates
+  const emptyDraft = () => ({ title: '', event_date: dates[0] || '', event_time: '', description: '' })
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -32,13 +35,17 @@ export default function EventsSchedule() {
   const [busy, setBusy] = useState(false)
 
   async function load() {
+    if (!festivalId) return
     setLoading(true)
-    const { data, error } = await supabase.from('events').select('*')
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('festival_id', festivalId)
     if (error) setError(error.message)
     else {
       const sorted = (data || []).sort(
         (a, b) =>
-          dateIndex(a.event_date) - dateIndex(b.event_date) ||
+          dates.indexOf(a.event_date) - dates.indexOf(b.event_date) ||
           timeToMinutes(a.event_time) - timeToMinutes(b.event_time)
       )
       setRows(sorted)
@@ -48,7 +55,7 @@ export default function EventsSchedule() {
 
   useEffect(() => {
     load()
-  }, [])
+  }, [festivalId])
 
   async function saveDraft() {
     if (!draft.title.trim()) return setError('Please enter a title.')
@@ -63,7 +70,7 @@ export default function EventsSchedule() {
     }
     const { error } = draft.id
       ? await supabase.from('events').update(payload).eq('id', draft.id)
-      : await supabase.from('events').insert(payload)
+      : await supabase.from('events').insert({ ...payload, festival_id: festivalId })
     setBusy(false)
     if (error) return setError(error.message)
     setDraft(null)
@@ -88,14 +95,14 @@ export default function EventsSchedule() {
           ← Dashboard
         </Link>
         {isAdmin && (
-          <button className="btn small" onClick={() => setDraft({ ...EMPTY })}>
+          <button className="btn small" onClick={() => setDraft(emptyDraft())}>
             + Add event
           </button>
         )}
         <span className="count">{rows.length} events</span>
       </div>
 
-      <h2 className="page-title">Events Schedule</h2>
+      <h2 className="page-title">{schedule.label}</h2>
 
       {error && <p className="error center">{error}</p>}
       {loading && <p className="muted center">Loading…</p>}
@@ -166,7 +173,7 @@ export default function EventsSchedule() {
                 value={draft.event_date}
                 onChange={(e) => setDraft({ ...draft, event_date: e.target.value })}
               >
-                {AARTI_DATES.map((d) => (
+                {dates.map((d) => (
                   <option key={d} value={d}>
                     {d}
                   </option>

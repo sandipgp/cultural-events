@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient.js'
-import { PROGRAMS, AGE_GROUPS } from '../lib/festival.js'
 import { useAdmin } from '../lib/admin.jsx'
+import { useFestival, useModules } from '../lib/festivalContext.jsx'
 import AppHeader from '../components/AppHeader.jsx'
 import AppFooter from '../components/AppFooter.jsx'
 
 export default function ProgramList() {
   const { isAdmin } = useAdmin()
+  const { festival } = useFestival()
+  const festivalId = festival?.id
+  const { participation } = useModules()
+  const PROGRAMS = participation.categories
+  const AGE_GROUPS = participation.ageGroups
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -17,10 +22,12 @@ export default function ProgramList() {
   const [busy, setBusy] = useState(false)
 
   async function load() {
+    if (!festivalId) return
     setLoading(true)
     const { data, error } = await supabase
       .from('program_participants')
       .select('*')
+      .eq('festival_id', festivalId)
       .order('created_at', { ascending: true })
     if (error) setError(error.message)
     else setRows(data || [])
@@ -29,7 +36,7 @@ export default function ProgramList() {
 
   useEffect(() => {
     load()
-  }, [])
+  }, [festivalId])
 
   const OTHERS = 'Others'
   const shown =

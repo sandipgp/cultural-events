@@ -1,14 +1,19 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient.js'
-import { PROGRAMS, AGE_GROUPS } from '../lib/festival.js'
+import { useFestival, useModules } from '../lib/festivalContext.jsx'
 import AppHeader from '../components/AppHeader.jsx'
 import AppFooter from '../components/AppFooter.jsx'
 
 const OTHER = 'Other'
-const OPTIONS = [...PROGRAMS, OTHER]
 
 export default function ProgramForm() {
+  const { festival } = useFestival()
+  const festivalId = festival?.id
+  const { participation } = useModules()
+  const options = participation.allowOther
+    ? [...participation.categories, OTHER]
+    : participation.categories
   const [name, setName] = useState('')
   const [ageGroup, setAgeGroup] = useState('')
   const [events, setEvents] = useState([])
@@ -38,9 +43,11 @@ export default function ProgramForm() {
     if (events.length === 0) return setError('Pick at least one program.')
     if (events.includes(OTHER) && !otherText.trim())
       return setError('Please specify the other program.')
+    if (!festivalId) return setError('Still loading — please try again in a moment.')
 
     setStatus('saving')
     const { error } = await supabase.from('program_participants').insert({
+      festival_id: festivalId,
       name: name.trim(),
       age_group: ageGroup,
       events: resolvedEvents(),
@@ -80,8 +87,8 @@ export default function ProgramForm() {
       <AppHeader />
 
       <div className="intro card">
-        <h2>Participate in Program</h2>
-        <p>Choose the cultural programs you'd like to take part in. 🎉</p>
+        <h2>Participate in {participation.label}</h2>
+        <p>Choose the programs you'd like to take part in. 🎉</p>
       </div>
 
       <form className="card form" onSubmit={handleSubmit}>
@@ -99,7 +106,7 @@ export default function ProgramForm() {
           <span>Age group</span>
           <select value={ageGroup} onChange={(e) => setAgeGroup(e.target.value)}>
             <option value="">Select age group…</option>
-            {AGE_GROUPS.map((g) => (
+            {participation.ageGroups.map((g) => (
               <option key={g} value={g}>
                 {g}
               </option>
@@ -110,7 +117,7 @@ export default function ProgramForm() {
         <div className="field">
           <span>Programs (select one or more)</span>
           <div className="checks">
-            {OPTIONS.map((p) => (
+            {options.map((p) => (
               <label key={p} className={`check ${events.includes(p) ? 'on' : ''}`}>
                 <input
                   type="checkbox"
