@@ -146,7 +146,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className={`tiles ${eventsOver ? 'featured' : ''}`}>
+      <div className="tiles featured">
         {visibleTiles.map((t) => (
           <Link
             key={t.to}

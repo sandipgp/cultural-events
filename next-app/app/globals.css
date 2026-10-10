@@ -23,11 +23,17 @@ html {
 html, body {
   margin: 0;
   padding: 0;
-  min-height: 100%;
-  background: linear-gradient(160deg, var(--bg-grad-1), var(--bg-grad-2)) no-repeat;
   color: var(--ink);
   font-family: "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  /* `fixed` makes the gradient cover the viewport regardless of content height
+     or the mobile toolbar collapsing — no white gap at the bottom. */
+  background: linear-gradient(160deg, var(--bg-grad-1), var(--bg-grad-2)) fixed;
+  background-color: var(--bg-grad-2);
 }
 
 img { max-width: 100%; display: block; }
@@ -40,20 +46,20 @@ img { max-width: 100%; display: block; }
   min-height: 100dvh; /* matches the visible area on mobile (no toolbar gap) */
 }
 /* Secondary hero media (image/video) below the dashboard hero.
-   Full-bleed: breaks out of the screen's side padding, no card chrome. */
+   Matches the hero card: same width/margins, inset padding, gradient frame. */
 .hero-media {
-  padding: 0;
+  padding: 0 !important;
+  margin: 0 0 14px;
   overflow: hidden;
-  margin: 0 -16px 14px;
   border: none;
-  border-radius: 0;
-  box-shadow: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 .hero-media img,
 .hero-media video {
   display: block;
   width: 100%;
-  max-height: 460px;
+  max-height: 300px;
   object-fit: cover;
 }
 
@@ -616,8 +622,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
   text-decoration: none;
   color: var(--ink);
   border: 1px solid var(--line);
-  background: linear-gradient(150deg, #fff8fc 0%, #ffeef7 55%, #fff2ea 100%);
-  box-shadow: 0 4px 14px rgba(160, 40, 120, 0.07);
+  background: linear-gradient(150deg, #fff0f8 0%, #ffe3f1 55%, #ffe7d6 100%);
+  box-shadow: 0 4px 14px rgba(160, 40, 120, 0.09);
   transition: transform 0.08s, box-shadow 0.15s, border-color 0.15s;
 }
 .tile:active { transform: scale(0.97); }
